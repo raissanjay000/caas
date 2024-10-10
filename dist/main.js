@@ -1,5 +1,9 @@
 /*!
+<<<<<<< HEAD
  * Chimera UI Libraries - Build 0.21.11 (10/4/2024, 11:32:14)
+=======
+ * Chimera UI Libraries - Build 0.21.11 (10/10/2024, 14:39:16)
+>>>>>>> 72903bc (feat(mwpw-157946): carlos comments)
  *         
  */
 /******/ (function(modules) { // webpackBootstrap
