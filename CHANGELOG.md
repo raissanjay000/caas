@@ -1,5 +1,14 @@
 
 
+# [0.22.0](https://github.com/adobecom/caas/compare/0.21.12...0.22.0) (2024-10-15)
+
+
+### Features
+
+* **mwpw-157946:** rebuild dist files ([df2aa15](https://github.com/adobecom/caas/commit/df2aa1560fefdea0b4af29ec265a94bc1046280b))
+* **mwpw-157946:** ui bug fixes ([dd529f2](https://github.com/adobecom/caas/commit/dd529f2637f7d5fde368c1c13774c155eab6a8ea))
+* **mwpw-157946:** ui bug fixes + rebase ([69073f1](https://github.com/adobecom/caas/commit/69073f11c4831699dd2e9230d44cbd45fd3f8770))
+
 ## [0.21.12](https://github.com/adobecom/caas/compare/0.21.11...0.21.12) (2024-10-10)
 
 
