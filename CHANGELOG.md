@@ -1,5 +1,12 @@
 
 
+## [0.22.1](https://github.com/adobecom/caas/compare/0.22.0...0.22.1) (2024-10-16)
+
+
+### Bug Fixes
+
+* **MWPW-157947:** Fixes spacing issue with 2 cards showing ([#192](https://github.com/adobecom/caas/issues/192)) ([35f3250](https://github.com/adobecom/caas/commit/35f32502df253331c534ca2a159b4f54cf5908d5))
+
 # [0.22.0](https://github.com/adobecom/caas/compare/0.21.12...0.22.0) (2024-10-15)
 
 
