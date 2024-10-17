@@ -1,5 +1,12 @@
 
 
+## [0.22.2](https://github.com/adobecom/caas/compare/0.22.1...0.22.2) (2024-10-17)
+
+
+### Bug Fixes
+
+* **MWPW-159381:** Moves CSS instruction from BODY to the component ([#193](https://github.com/adobecom/caas/issues/193)) ([30f705d](https://github.com/adobecom/caas/commit/30f705d52cf87172c8708f4f53a24e3fd0b6093e))
+
 ## [0.22.1](https://github.com/adobecom/caas/compare/0.22.0...0.22.1) (2024-10-16)
 
 
