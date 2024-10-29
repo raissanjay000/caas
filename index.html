@@ -76,9 +76,9 @@
                         description: "Sign Up"
                     }
                 },
-                resultsPerPage: '5',
-                endpoint: location.hostname === "localhost" ? "../../mock-json/all-art-board-15-cards-show.json" : "https://14257-chimera.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?origin=northstar&size=20",
-                totalCardsToShow: '55',
+                resultsPerPage: '200',
+                endpoint: location.hostname === "localhost" ? "../../mock-json/all-art-board-15-cards-show.json" : "https://14257-chimera-sanrai.adobeioruntime.net/api/v1/web/chimera-0.0.1/collection?originSelection=&contentTypeTags=&secondSource=&secondaryTags=&collectionTags=&excludeContentWithTags=&language=en&country=us&complexQuery=&excludeIds=&currentEntityId=&featuredCards=&environment=&draft=false&flatFile=false&size=20",
+                totalCardsToShow: '200',
                 cardStyle: "1:2", // available options: "1:2", "3:4", "full-card", "half-height", "custom-card", "product", "double-wide";
                 showTotalResults: 'true',
                 i18n: {
@@ -93,6 +93,10 @@
                 },
                 setCardBorders: "true", // Can be true or false;
                 useOverlayLinks: "false", // Can be true or false;
+                partialLoadWithBackgroundFetch: {
+                    enabled: true,
+                    partialLoadCount: 10,
+                }
             },
             featuredCards: ['c7d34f39-397c-3727-9dff-5d0d9d8cf731'],
             filterPanel: {

@@ -852,7 +852,7 @@ const Container = (props) => {
                         }
                         hideCtaTags = temp;
                     }
-                    setCardCount(payload.total ? payload.total : payload.cards.length);
+                    setCardCount(payload.totalCount ? payload.totalCount : payload.cards.length);
                     const { processedCards = [] } = new JsonProcessor(payload.cards)
                         .removeDuplicateCards()
                         .addCardMetaData(
