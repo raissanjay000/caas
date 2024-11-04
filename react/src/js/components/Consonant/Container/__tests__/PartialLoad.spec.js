@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor, act, render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
 import Container from '../Container';
@@ -27,9 +27,9 @@ describe('Consonant/Container/Partial Load', () => {
                     endpoint: 'https://test-endpoint/api',
                     partialLoadWithBackgroundFetch: {
                         enabled: true,
-                        partialLoadCount: 10
-                    }
-                }
+                        partialLoadCount: 10,
+                    },
+                },
             };
 
             // Mock first fetch for partial load
@@ -41,10 +41,9 @@ describe('Consonant/Container/Partial Load', () => {
                     url: 'test.html',
                     json: () => Promise.resolve({
                         cards: cards.slice(0, 10),
-                        totalCount: cards.length
+                        totalCount: cards.length,
                     }),
-                })
-            );
+                }));
 
             // Mock second fetch for full load
             global.fetch.mockImplementationOnce(() =>
@@ -54,8 +53,7 @@ describe('Consonant/Container/Partial Load', () => {
                     statusText: 'success',
                     url: 'test.html',
                     json: () => Promise.resolve({ cards }),
-                })
-            );
+                }));
 
             await act(async () => {
                 render(<Container config={configWithPartialLoad} />);
@@ -82,9 +80,9 @@ describe('Consonant/Container/Partial Load', () => {
                     ...config.collection,
                     endpoint: 'https://test-endpoint/api',
                     partialLoadWithBackgroundFetch: {
-                        enabled: false
-                    }
-                }
+                        enabled: false,
+                    },
+                },
             };
 
             global.fetch.mockImplementationOnce(() =>
@@ -94,8 +92,7 @@ describe('Consonant/Container/Partial Load', () => {
                     statusText: 'success',
                     url: 'test.html',
                     json: () => Promise.resolve({ cards }),
-                })
-            );
+                }));
 
             await act(async () => {
                 render(<Container config={configWithoutPartialLoad} />);
