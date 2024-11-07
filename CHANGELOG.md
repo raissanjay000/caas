@@ -1,5 +1,12 @@
 
 
+# [0.23.0](https://github.com/adobecom/caas/compare/0.22.4...0.23.0) (2024-11-07)
+
+
+### Features
+
+* **MWPW-150610:** implement partial load with background fetch ([e142533](https://github.com/adobecom/caas/commit/e142533d0961fb2f764f12d4ed2dd48ec703abe2))
+
 ## [0.22.4](https://github.com/adobecom/caas/compare/0.22.3...0.22.4) (2024-10-29)
 
 ## [0.22.3](https://github.com/adobecom/caas/compare/0.22.2...0.22.3) (2024-10-22)
