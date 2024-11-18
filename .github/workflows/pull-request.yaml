@@ -95,24 +95,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y xvfb libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2
 
+      - name: Make github directory
+        run: mkdir -p .github
+
       - name: Download baseline
         id: download
         uses: actions/download-artifact@v3
         with:
           name: web-vitals-baseline
-          path: .github/
+          path: .github
         continue-on-error: true
 
-      - name: Debug directories
+      - name: List downloaded files
         run: |
-          echo "Current directory:"
-          pwd
-          echo "Contents of current directory:"
-          ls -la
-          echo "Contents of .github directory:"
+          echo "After download"
           ls -la .github/
-          echo "Checking specific file:"
-          test -f .github/web-vitals-history.json && echo "File exists" || echo "File does not exist"
 
       - name: Check if baseline exists
         id: check
