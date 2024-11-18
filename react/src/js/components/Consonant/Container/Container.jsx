@@ -196,6 +196,7 @@ const Container = (props) => {
     const [transition, setTransition] = useState(0);
 
     const [cardCount, setCardCount] = useState(0);
+    const [isPartialLoad, setIsPartialLoad] = useState(false);
 
     const [, updateState] = React.useState();
     const scrollElementRef = useRef(null);
@@ -1019,7 +1020,12 @@ const Container = (props) => {
         if (!targetEnabled && partialLoadWithBackgroundFetch) {
             const collectionEndpointUrl = new URL(collectionEndpoint);
             collectionEndpointUrl.searchParams.set('partialLoadCount', String(partialLoadCount));
-            getCards(collectionEndpointUrl.toString()).then(() => getCards());
+            setIsPartialLoad(true);
+            getCards(collectionEndpointUrl.toString()).then(() => {
+                getCards().then(() => {
+                    setIsPartialLoad(false);
+                });
+            });
         }
     }, [visibleStamp, hasFetched]);
 
@@ -1136,18 +1142,22 @@ const Container = (props) => {
      * @type {Array}
      */
     const gridCards = timedCollection.length ? timedCollection : filteredCards;
+    let gridCardLen = gridCards.length;
+    if (isPartialLoad) {
+        gridCardLen = cardCount;
+    }
 
     /**
      * Total pages (used by Paginator Component)
      * @type {Number}
      */
-    const totalPages = getTotalPages(resultsPerPage, cardCount);
+    const totalPages = getTotalPages(resultsPerPage, gridCardLen);
 
     /**
      * Number of cards to show (used by Load More component)
      * @type {Number}
      */
-    const numCardsToShow = getNumCardsToShow(resultsPerPage, currentPage, cardCount);
+    const numCardsToShow = getNumCardsToShow(resultsPerPage, currentPage, gridCardLen);
 
     /**
      * How many filters were selected - (used by Left Filter Panel)
@@ -1162,7 +1172,7 @@ const Container = (props) => {
     const displayPagination = shouldDisplayPaginator(
         paginationIsEnabled,
         totalCardLimit,
-        cardCount,
+        gridCardLen,
     );
     /**
      * Conditions to display the Load More Button
@@ -1186,7 +1196,7 @@ const Container = (props) => {
      * Whether at lease one card was returned by Card Filterer
      * @type {Boolean}
      */
-    const atLeastOneCard = cardCount > 0;
+    const atLeastOneCard = gridCardLen > 0;
 
     /**
      * Where to place the Sort Popup (either left or right)
@@ -1416,7 +1426,7 @@ const Container = (props) => {
                                 onMobileFiltersToggleClick={handleMobileFiltersToggle}
                                 onSelectedFilterClick={handleCheckBoxChange}
                                 showMobileFilters={showMobileFilters}
-                                resQty={cardCount}
+                                resQty={gridCardLen}
                                 bookmarkComponent={
                                     <Bookmarks
                                         showBookmarks={showBookmarks}
@@ -1440,7 +1450,7 @@ const Container = (props) => {
                                 filterPanelEnabled={filterPanelEnabled}
                                 filters={filters}
                                 windowWidth={windowWidth}
-                                resQty={cardCount}
+                                resQty={gridCardLen}
                                 onCheckboxClick={handleCheckBoxChange}
                                 onFilterClick={handleFilterGroupClick}
                                 onClearFilterItems={clearFilterItem}
@@ -1473,7 +1483,7 @@ const Container = (props) => {
                                 enabled={filterPanelEnabled}
                                 filtersQty={filters.length}
                                 filters={filters}
-                                cardsQty={gridCards.length}
+                                cardsQty={gridCardLen}
                                 selectedFiltersQty={selectedFiltersItemsQty}
                                 windowWidth={windowWidth}
                                 onMobileFiltersToggleClick={handleMobileFiltersToggle}
@@ -1511,7 +1521,7 @@ const Container = (props) => {
                                 <LoadMore
                                     onClick={onLoadMoreClick}
                                     show={numCardsToShow}
-                                    total={cardCount} />
+                                    total={gridCardLen} />
                                 }
                                 {displayPaginator &&
                                 <Paginator
@@ -1519,13 +1529,13 @@ const Container = (props) => {
                                     currentPageNumber={currentPage}
                                     totalPages={totalPages}
                                     showItemsPerPage={resultsPerPage}
-                                    totalResults={cardCount}
+                                    totalResults={gridCardLen}
                                     onClick={setCurrentPage} />
                                 }
                             </Fragment>}
                             { atLeastOneCard && isCarouselContainer && !(cardStyle === 'custom-card') &&
                             <CardsCarousel
-                                resQty={cardCount}
+                                resQty={gridCardLen}
                                 cards={gridCards}
                                 role="tablist"
                                 onCardBookmark={handleCardBookmarking} />
