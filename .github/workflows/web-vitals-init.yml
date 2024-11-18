@@ -1,0 +1,44 @@
+name: Initialize Web Vitals Baseline
+
+on:
+  workflow_dispatch:
+    inputs:
+      initialize:
+        description: 'Initialize baseline'
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  initialize-web-vitals:
+    if: inputs.initialize == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.13.1
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install puppeteer web-vitals
+
+      - name: Install Chrome dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2
+
+      - name: Initialize Baseline
+        run: |
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node ./web-vitals-check.js https://adobecom.github.io/caas/ --init-baseline
+
+      - name: Upload baseline artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-vitals-baseline
+          path: .github/web-vitals-history.json
+          retention-days: 90
