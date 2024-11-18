@@ -1,5 +1,12 @@
 
 
+## [0.23.3](https://github.com/adobecom/caas/compare/0.23.2...0.23.3) (2024-11-18)
+
+
+### Bug Fixes
+
+* **partial-load:** properly scope feature flag and manage grid card state ([7cb1417](https://github.com/adobecom/caas/commit/7cb1417ea1bf78e3e4e35076b52656bfe5317471))
+
 ## [0.23.2](https://github.com/adobecom/caas/compare/0.23.1...0.23.2) (2024-11-18)
 
 ## [0.23.1](https://github.com/adobecom/caas/compare/0.23.0...0.23.1) (2024-11-18)
