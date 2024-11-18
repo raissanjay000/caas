@@ -69,7 +69,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          # Uploads entire repository
           path: '.'
       - name: Deploy to GitHub Pages
         id: deployment
@@ -97,19 +96,29 @@ jobs:
           sudo apt-get install -y xvfb libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2
 
       - name: Download baseline
+        id: download
         uses: actions/download-artifact@v3
         with:
           name: web-vitals-baseline
           path: .github/
-        continue-on-error: true  # In case no baseline exists yet
+        continue-on-error: true
+
+      - name: Check if baseline exists
+        id: check
+        run: |
+          if [ ! -f .github/web-vitals-history.json ]; then
+            echo "No baseline found. Please run initialization workflow first."
+            exit 1
+          fi
 
       - name: Run Web Vitals Check
+        if: steps.check.outcome == 'success'
         id: web-vitals
         run: |
           xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node ./web-vitals-check.js https://adobecom.github.io/caas/
 
       - name: Upload updated baseline
-        if: success()  # Only upload if checks pass
+        if: success()
         uses: actions/upload-artifact@v3
         with:
           name: web-vitals-baseline
