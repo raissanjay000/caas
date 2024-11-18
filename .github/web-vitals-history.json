@@ -1,0 +1,162 @@
+{
+  "desktop": {
+    "lcp": {
+      "points": [
+        {
+          "value": 10290.100000000006,
+          "date": "2024-11-18T16:55:02.287Z",
+          "branch": "main"
+        },
+        {
+          "value": 9903.399999999994,
+          "date": "2024-11-18T16:55:02.288Z",
+          "branch": "main"
+        },
+        {
+          "value": 9916.300000000017,
+          "date": "2024-11-18T16:55:02.288Z",
+          "branch": "main"
+        },
+        {
+          "value": 10111.299999999988,
+          "date": "2024-11-18T16:55:02.289Z",
+          "branch": "main"
+        },
+        {
+          "value": 9997.199999999953,
+          "date": "2024-11-18T16:55:02.289Z",
+          "branch": "main"
+        }
+      ],
+      "currentStats": {
+        "mean": 10043.659999999993,
+        "stdDev": 143.77747528733616,
+        "sampleSize": 5,
+        "lastUpdated": "2024-11-18T16:55:02.289Z"
+      }
+    },
+    "fid": {
+      "points": [
+        {
+          "value": 0.7000000000116415,
+          "date": "2024-11-18T16:55:02.287Z",
+          "branch": "main"
+        },
+        {
+          "value": 0.6000000000058208,
+          "date": "2024-11-18T16:55:02.288Z",
+          "branch": "main"
+        },
+        {
+          "value": 0.5999999999767169,
+          "date": "2024-11-18T16:55:02.288Z",
+          "branch": "main"
+        },
+        {
+          "value": 0.6000000000349246,
+          "date": "2024-11-18T16:55:02.289Z",
+          "branch": "main"
+        },
+        {
+          "value": 0.5999999999767169,
+          "date": "2024-11-18T16:55:02.289Z",
+          "branch": "main"
+        }
+      ],
+      "currentStats": {
+        "mean": 0.6200000000011642,
+        "stdDev": 0.040000000005238685,
+        "sampleSize": 5,
+        "lastUpdated": "2024-11-18T16:55:02.289Z"
+      }
+    },
+    "cls": {
+      "points": [],
+      "currentStats": {
+        "mean": null,
+        "stdDev": null,
+        "sampleSize": 0
+      }
+    }
+  },
+  "mobile": {
+    "lcp": {
+      "points": [
+        {
+          "value": 10376,
+          "date": "2024-11-18T16:58:05.903Z",
+          "branch": "main"
+        },
+        {
+          "value": 10525.5,
+          "date": "2024-11-18T16:58:05.904Z",
+          "branch": "main"
+        },
+        {
+          "value": 10361.299999999988,
+          "date": "2024-11-18T16:58:05.904Z",
+          "branch": "main"
+        },
+        {
+          "value": 10369.900000000023,
+          "date": "2024-11-18T16:58:05.905Z",
+          "branch": "main"
+        },
+        {
+          "value": 10358.100000000035,
+          "date": "2024-11-18T16:58:05.905Z",
+          "branch": "main"
+        }
+      ],
+      "currentStats": {
+        "mean": 10398.160000000009,
+        "stdDev": 63.98223503441677,
+        "sampleSize": 5,
+        "lastUpdated": "2024-11-18T16:58:05.905Z"
+      }
+    },
+    "fid": {
+      "points": [
+        {
+          "value": 0.7999999999883585,
+          "date": "2024-11-18T16:58:05.903Z",
+          "branch": "main"
+        },
+        {
+          "value": 0.9000000000232831,
+          "date": "2024-11-18T16:58:05.904Z",
+          "branch": "main"
+        },
+        {
+          "value": 1,
+          "date": "2024-11-18T16:58:05.904Z",
+          "branch": "main"
+        },
+        {
+          "value": 0.9000000000232831,
+          "date": "2024-11-18T16:58:05.905Z",
+          "branch": "main"
+        },
+        {
+          "value": 1.099999999976717,
+          "date": "2024-11-18T16:58:05.905Z",
+          "branch": "main"
+        }
+      ],
+      "currentStats": {
+        "mean": 0.9400000000023283,
+        "stdDev": 0.10198039026409318,
+        "sampleSize": 5,
+        "lastUpdated": "2024-11-18T16:58:05.905Z"
+      }
+    },
+    "cls": {
+      "points": [],
+      "currentStats": {
+        "mean": null,
+        "stdDev": null,
+        "sampleSize": 0
+      }
+    }
+  }
+}
