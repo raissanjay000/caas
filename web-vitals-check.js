@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 
-const SAMPLE_COUNT = 5;
+const SAMPLE_COUNT = 15;
 
 // Device settings matching Google's testing parameters
 const DEVICES = {
