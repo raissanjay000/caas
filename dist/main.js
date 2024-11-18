@@ -1,5 +1,5 @@
 /*!
- * Chimera UI Libraries - Build 0.22.4 (11/4/2024, 04:38:25)
+ * Chimera UI Libraries - Build 0.23.0 (11/18/2024, 02:32:36)
  *         
  */
 /******/ (function(modules) { // webpackBootstrap
@@ -3592,7 +3592,6 @@ var loadLana = exports.loadLana = function loadLana() {
                 args[_key] = arguments[_key];
             }
 
-            // eslint-disable-next-line no-console
             (_console = console).log.apply(_console, ['Lana not yet loaded, logging to console:'].concat(args));
         },
         log: function () {
@@ -3624,7 +3623,6 @@ var loadLana = exports.loadLana = function loadLana() {
                                 _context.prev = 9;
                                 _context.t0 = _context['catch'](3);
 
-                                // eslint-disable-next-line no-console
                                 console.error('Failed to load Lana:', _context.t0);
 
                             case 12:
@@ -6376,6 +6374,11 @@ var Container = function Container(props) {
         cardCount = _useState6[0],
         setCardCount = _useState6[1];
 
+    var _useState7 = (0, _react.useState)(false),
+        _useState8 = _slicedToArray(_useState7, 2),
+        isPartialLoad = _useState8[0],
+        setIsPartialLoad = _useState8[1];
+
     var _React$useState = _react2.default.useState(),
         _React$useState2 = _slicedToArray(_React$useState, 2),
         updateState = _React$useState2[1];
@@ -6414,10 +6417,10 @@ var Container = function Container(props) {
      */
 
 
-    var _useState7 = (0, _react.useState)(null),
-        _useState8 = _slicedToArray(_useState7, 2),
-        openDropdown = _useState8[0],
-        setOpenDropdown = _useState8[1];
+    var _useState9 = (0, _react.useState)(null),
+        _useState10 = _slicedToArray(_useState9, 2),
+        openDropdown = _useState10[0],
+        setOpenDropdown = _useState10[1];
 
     /**
      * @typedef {Array} BookmarkedCardIdsState — Initiailzed From Local Storage
@@ -6428,14 +6431,14 @@ var Container = function Container(props) {
      */
 
 
-    var _useState9 = (0, _react.useState)((0, _general.readBookmarksFromLocalStorage)()),
-        _useState10 = _slicedToArray(_useState9, 2),
-        bookmarkedCardIds = _useState10[0],
-        setBookmarkedCardIds = _useState10[1];
+    var _useState11 = (0, _react.useState)((0, _general.readBookmarksFromLocalStorage)()),
+        _useState12 = _slicedToArray(_useState11, 2),
+        bookmarkedCardIds = _useState12[0],
+        setBookmarkedCardIds = _useState12[1];
 
-    var _useState11 = (0, _react.useState)((0, _general.readInclusionsFromLocalStorage)()),
-        _useState12 = _slicedToArray(_useState11, 1),
-        inclusionIds = _useState12[0];
+    var _useState13 = (0, _react.useState)((0, _general.readInclusionsFromLocalStorage)()),
+        _useState14 = _slicedToArray(_useState13, 1),
+        inclusionIds = _useState14[0];
 
     /**
      * @typedef {Number} CurrentPageState — Initialized to the first page
@@ -6447,10 +6450,10 @@ var Container = function Container(props) {
      */
 
 
-    var _useState13 = (0, _react.useState)(+urlState.page || 1),
-        _useState14 = _slicedToArray(_useState13, 2),
-        currentPage = _useState14[0],
-        setCurrentPage = _useState14[1];
+    var _useState15 = (0, _react.useState)(+urlState.page || 1),
+        _useState16 = _slicedToArray(_useState15, 2),
+        currentPage = _useState16[0],
+        setCurrentPage = _useState16[1];
 
     /**
      * @typedef {Array} FiltersState — Contains Filters For Filter Panel
@@ -6462,17 +6465,17 @@ var Container = function Container(props) {
      */
 
 
-    var _useState15 = (0, _react.useState)([]),
-        _useState16 = _slicedToArray(_useState15, 2),
-        filters = _useState16[0],
-        setFilters = _useState16[1];
+    var _useState17 = (0, _react.useState)([]),
+        _useState18 = _slicedToArray(_useState17, 2),
+        filters = _useState18[0],
+        setFilters = _useState18[1];
     // window.filters = filters;
 
 
-    var _useState17 = (0, _react.useState)([]),
-        _useState18 = _slicedToArray(_useState17, 2),
-        currCategories = _useState18[0],
-        setCategories = _useState18[1];
+    var _useState19 = (0, _react.useState)([]),
+        _useState20 = _slicedToArray(_useState19, 2),
+        currCategories = _useState20[0],
+        setCategories = _useState20[1];
 
     /**
      * @typedef {String} SearchQueryState — Will be used to search through cards
@@ -6482,15 +6485,15 @@ var Container = function Container(props) {
      */
 
 
-    var _useState19 = (0, _react.useState)(''),
-        _useState20 = _slicedToArray(_useState19, 2),
-        searchQuery = _useState20[0],
-        setSearchQuery = _useState20[1];
-
     var _useState21 = (0, _react.useState)(''),
         _useState22 = _slicedToArray(_useState21, 2),
-        selectedCategory = _useState22[0],
-        setSelectedCategory = _useState22[1];
+        searchQuery = _useState22[0],
+        setSearchQuery = _useState22[1];
+
+    var _useState23 = (0, _react.useState)(''),
+        _useState24 = _slicedToArray(_useState23, 2),
+        selectedCategory = _useState24[0],
+        setSelectedCategory = _useState24[1];
 
     /**
      * @typedef {String} SortOpenedState — Toggles Sort Popup Opened Or Closed
@@ -6500,10 +6503,10 @@ var Container = function Container(props) {
      */
 
 
-    var _useState23 = (0, _react.useState)(false),
-        _useState24 = _slicedToArray(_useState23, 2),
-        sortOpened = _useState24[0],
-        setSortOpened = _useState24[1];
+    var _useState25 = (0, _react.useState)(false),
+        _useState26 = _slicedToArray(_useState25, 2),
+        sortOpened = _useState26[0],
+        setSortOpened = _useState26[1];
 
     /**
      * @typedef {String} SortOptionState — Can be one of a range of types
@@ -6515,10 +6518,10 @@ var Container = function Container(props) {
      */
 
 
-    var _useState25 = (0, _react.useState)(defaultSortOption),
-        _useState26 = _slicedToArray(_useState25, 2),
-        sortOption = _useState26[0],
-        setSortOption = _useState26[1];
+    var _useState27 = (0, _react.useState)(defaultSortOption),
+        _useState28 = _slicedToArray(_useState27, 2),
+        sortOption = _useState28[0],
+        setSortOption = _useState28[1];
 
     if (sortOption.sort === _constants.SORT_TYPES.RANDOM) {
         totalCardLimit = sampleSize;
@@ -6547,10 +6550,10 @@ var Container = function Container(props) {
      */
 
 
-    var _useState27 = (0, _react.useState)(false),
-        _useState28 = _slicedToArray(_useState27, 2),
-        showMobileFilters = _useState28[0],
-        setShowMobileFilters = _useState28[1];
+    var _useState29 = (0, _react.useState)(false),
+        _useState30 = _slicedToArray(_useState29, 2),
+        showMobileFilters = _useState30[0],
+        setShowMobileFilters = _useState30[1];
 
     /**
      * @typedef {Boolean} ShowBookmarkState — Can either be true or false
@@ -6563,10 +6566,10 @@ var Container = function Container(props) {
      */
 
 
-    var _useState29 = (0, _react.useState)(false),
-        _useState30 = _slicedToArray(_useState29, 2),
-        showBookmarks = _useState30[0],
-        setShowBookmarks = _useState30[1];
+    var _useState31 = (0, _react.useState)(false),
+        _useState32 = _slicedToArray(_useState31, 2),
+        showBookmarks = _useState32[0],
+        setShowBookmarks = _useState32[1];
 
     /**
      * @typedef {Boolean} LimitFilterQuantityState — Can either be true or false
@@ -6579,10 +6582,10 @@ var Container = function Container(props) {
      */
 
 
-    var _useState31 = (0, _react.useState)(filterPanelType === 'top'),
-        _useState32 = _slicedToArray(_useState31, 2),
-        showLimitedFiltersQty = _useState32[0],
-        setShowLimitedFiltersQty = _useState32[1];
+    var _useState33 = (0, _react.useState)(filterPanelType === 'top'),
+        _useState34 = _slicedToArray(_useState33, 2),
+        showLimitedFiltersQty = _useState34[0],
+        setShowLimitedFiltersQty = _useState34[1];
 
     /**
      * @typedef {Array} CardState
@@ -6595,10 +6598,10 @@ var Container = function Container(props) {
      */
 
 
-    var _useState33 = (0, _react.useState)([]),
-        _useState34 = _slicedToArray(_useState33, 2),
-        cards = _useState34[0],
-        setCards = _useState34[1];
+    var _useState35 = (0, _react.useState)([]),
+        _useState36 = _slicedToArray(_useState35, 2),
+        cards = _useState36[0],
+        setCards = _useState36[1];
 
     /**
      * @typedef {Boolean} LoadingState — Can either be true or false
@@ -6611,10 +6614,10 @@ var Container = function Container(props) {
      */
 
 
-    var _useState35 = (0, _react.useState)(false),
-        _useState36 = _slicedToArray(_useState35, 2),
-        isLoading = _useState36[0],
-        setLoading = _useState36[1];
+    var _useState37 = (0, _react.useState)(false),
+        _useState38 = _slicedToArray(_useState37, 2),
+        isLoading = _useState38[0],
+        setLoading = _useState38[1];
 
     /**
      * @typedef {Boolean} ApiFailureState — Can either be true or false
@@ -6627,30 +6630,30 @@ var Container = function Container(props) {
      */
 
 
-    var _useState37 = (0, _react.useState)(false),
-        _useState38 = _slicedToArray(_useState37, 2),
-        isApiFailure = _useState38[0],
-        setApiFailure = _useState38[1];
-
-    var _useState39 = (0, _react.useState)(null),
+    var _useState39 = (0, _react.useState)(false),
         _useState40 = _slicedToArray(_useState39, 2),
-        randomSortId = _useState40[0],
-        setRandomSortId = _useState40[1];
+        isApiFailure = _useState40[0],
+        setApiFailure = _useState40[1];
 
-    var _useState41 = (0, _react.useState)(true),
+    var _useState41 = (0, _react.useState)(null),
         _useState42 = _slicedToArray(_useState41, 2),
-        isFirstLoad = _useState42[0],
-        setIsFirstLoad = _useState42[1];
+        randomSortId = _useState42[0],
+        setRandomSortId = _useState42[1];
 
-    var _useState43 = (0, _react.useState)(),
+    var _useState43 = (0, _react.useState)(true),
         _useState44 = _slicedToArray(_useState43, 2),
-        visibleStamp = _useState44[0],
-        setVisibleStamp = _useState44[1];
+        isFirstLoad = _useState44[0],
+        setIsFirstLoad = _useState44[1];
 
-    var _useState45 = (0, _react.useState)(false),
+    var _useState45 = (0, _react.useState)(),
         _useState46 = _slicedToArray(_useState45, 2),
-        hasFetched = _useState46[0],
-        setHasFetched = _useState46[1];
+        visibleStamp = _useState46[0],
+        setVisibleStamp = _useState46[1];
+
+    var _useState47 = (0, _react.useState)(false),
+        _useState48 = _slicedToArray(_useState47, 2),
+        hasFetched = _useState48[0],
+        setHasFetched = _useState48[1];
 
     /**
      * Creates a DOM reference to first filter item
@@ -7432,8 +7435,11 @@ var Container = function Container(props) {
         if (!targetEnabled && partialLoadWithBackgroundFetch) {
             var collectionEndpointUrl = new URL(collectionEndpoint);
             collectionEndpointUrl.searchParams.set('partialLoadCount', String(partialLoadCount));
+            setIsPartialLoad(true);
             getCards(collectionEndpointUrl.toString()).then(function () {
-                return getCards();
+                getCards().then(function () {
+                    setIsPartialLoad(false);
+                });
             });
         }
     }, [visibleStamp, hasFetched]);
@@ -7546,18 +7552,22 @@ var Container = function Container(props) {
 
 
     var gridCards = timedCollection.length ? timedCollection : filteredCards;
+    var gridCardLen = gridCards.length;
+    if (isPartialLoad) {
+        gridCardLen = cardCount;
+    }
 
     /**
      * Total pages (used by Paginator Component)
      * @type {Number}
      */
-    var totalPages = (0, _Helpers.getTotalPages)(resultsPerPage, cardCount);
+    var totalPages = (0, _Helpers.getTotalPages)(resultsPerPage, gridCardLen);
 
     /**
      * Number of cards to show (used by Load More component)
      * @type {Number}
      */
-    var numCardsToShow = (0, _Helpers.getNumCardsToShow)(resultsPerPage, currentPage, cardCount);
+    var numCardsToShow = (0, _Helpers.getNumCardsToShow)(resultsPerPage, currentPage, gridCardLen);
 
     /**
      * How many filters were selected - (used by Left Filter Panel)
@@ -7569,7 +7579,7 @@ var Container = function Container(props) {
      * Conditions to Display A Form Of Pagination
      * @type {Boolean}
      */
-    var displayPagination = (0, _Helpers.shouldDisplayPaginator)(paginationIsEnabled, totalCardLimit, cardCount);
+    var displayPagination = (0, _Helpers.shouldDisplayPaginator)(paginationIsEnabled, totalCardLimit, gridCardLen);
     /**
      * Conditions to display the Load More Button
      * @type {Boolean}
@@ -7592,7 +7602,7 @@ var Container = function Container(props) {
      * Whether at lease one card was returned by Card Filterer
      * @type {Boolean}
      */
-    var atLeastOneCard = cardCount > 0;
+    var atLeastOneCard = gridCardLen > 0;
 
     /**
      * Where to place the Sort Popup (either left or right)
@@ -7900,7 +7910,7 @@ var Container = function Container(props) {
                             onMobileFiltersToggleClick: handleMobileFiltersToggle,
                             onSelectedFilterClick: handleCheckBoxChange,
                             showMobileFilters: showMobileFilters,
-                            resQty: cardCount,
+                            resQty: gridCardLen,
                             bookmarkComponent: _react2.default.createElement(_Bookmarks2.default, {
                                 showBookmarks: showBookmarks,
                                 onClick: handleShowBookmarksFilterClick,
@@ -7920,7 +7930,7 @@ var Container = function Container(props) {
                             filterPanelEnabled: filterPanelEnabled,
                             filters: filters,
                             windowWidth: windowWidth,
-                            resQty: cardCount,
+                            resQty: gridCardLen,
                             onCheckboxClick: handleCheckBoxChange,
                             onFilterClick: handleFilterGroupClick,
                             onClearFilterItems: clearFilterItem,
@@ -7947,7 +7957,7 @@ var Container = function Container(props) {
                             enabled: filterPanelEnabled,
                             filtersQty: filters.length,
                             filters: filters,
-                            cardsQty: gridCards.length,
+                            cardsQty: gridCardLen,
                             selectedFiltersQty: selectedFiltersItemsQty,
                             windowWidth: windowWidth,
                             onMobileFiltersToggleClick: handleMobileFiltersToggle,
@@ -7980,17 +7990,17 @@ var Container = function Container(props) {
                             displayLoadMore && _react2.default.createElement(_LoadMore2.default, {
                                 onClick: onLoadMoreClick,
                                 show: numCardsToShow,
-                                total: cardCount }),
+                                total: gridCardLen }),
                             displayPaginator && _react2.default.createElement(_Paginator2.default, {
                                 pageCount: paginatorCount,
                                 currentPageNumber: currentPage,
                                 totalPages: totalPages,
                                 showItemsPerPage: resultsPerPage,
-                                totalResults: cardCount,
+                                totalResults: gridCardLen,
                                 onClick: setCurrentPage })
                         ),
                         atLeastOneCard && isCarouselContainer && !(cardStyle === 'custom-card') && _react2.default.createElement(_CardsCarousel2.default, {
-                            resQty: cardCount,
+                            resQty: gridCardLen,
                             cards: gridCards,
                             role: 'tablist',
                             onCardBookmark: handleCardBookmarking }),
