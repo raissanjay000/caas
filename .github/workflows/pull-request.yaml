@@ -10,20 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.13.1
-          cache: 'npm'
-      - name: Install Dependencies
-        run: npm ci
-      - name: Check PR Title
-        uses: amannn/action-semantic-pull-request@v5
+      - uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          requireJiraTicket: true
-          jiraTicketPattern: 'MWPW-[0-9]+'
           validateSingleCommit: false
           scopes:
             - regex:^MWPW-\d+$
