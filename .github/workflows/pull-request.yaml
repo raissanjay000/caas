@@ -19,7 +19,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const script = require('./scripts/test-enforcement.js')
+            const script = require('./test-enforcement.js')
             await script({github, context, core})
   check-linting:
     runs-on: ubuntu-latest
