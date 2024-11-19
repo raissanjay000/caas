@@ -95,29 +95,56 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y xvfb libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2
 
-      - name: Check if baseline exists
-        id: check
+      - name: Record Web Vitals
         run: |
-          if [ ! -f .github/web-vitals-history.json ]; then
-            echo "No baseline found in repository"
-            exit 1
-          fi
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node scripts/record-web-vitals.js
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
 
-      - name: Run Web Vitals Check
-        id: web-vitals
-        run: |
-          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node ./web-vitals-check.js https://adobecom.github.io/caas/
+      - name: Create PR Comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const metrics = JSON.parse(fs.readFileSync('.github/web-vitals-history.json', 'utf8'));
+            const latest = metrics[metrics.length - 1];
+            
+            const formatMetric = (metric) => {
+              if (!metric) return 'Not available';
+              return `${metric.mean.toFixed(2)} ±${metric.stdDev.toFixed(2)}`;
+            };
+            
+            const comment = `## Core Web Vitals Results
 
-      - name: Commit updated baseline if improved
-        if: success()
+            ### Desktop
+            - LCP: ${formatMetric(latest.metrics.desktop.lcp)}
+            - FID: ${formatMetric(latest.metrics.desktop.fid)}
+            - CLS: ${formatMetric(latest.metrics.desktop.cls)}
+            
+            ### Mobile
+            - LCP: ${formatMetric(latest.metrics.mobile.lcp)}
+            - FID: ${formatMetric(latest.metrics.mobile.fid)}
+            - CLS: ${formatMetric(latest.metrics.mobile.cls)}
+            
+            Recorded at: ${latest.timestamp}
+            `;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: Commit updated history
+        if: github.event.pull_request.merged == true
         run: |
-          if [ -f .github/web-vitals-history.json ]; then
             git config --global user.name 'GitHub Action'
             git config --global user.email 'action@github.com'
             git add .github/web-vitals-history.json
-            git commit -m "chore: update web vitals baseline" || echo "No changes to commit"
+            git commit -m "chore: update web vitals history [skip ci]" || echo "No changes to commit"
             git push || echo "No changes to push"
-          fi
   run-e2e-tests:
     runs-on: ubuntu-latest
     needs: deployment
