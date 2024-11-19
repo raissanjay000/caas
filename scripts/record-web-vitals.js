@@ -1,7 +1,8 @@
-// scripts/record-web-vitals.js
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { exec } = require('child_process');
 const path = require('path');
+const util = require('util');
+const execPromise = util.promisify(exec);
 
 // Helper functions for statistics
 function calculateMean(values) {
@@ -16,59 +17,79 @@ function calculateStdDev(values) {
 
 // Parse metrics from web-vitals-check.js output
 function parseMetrics(output) {
-    const metrics = {};
-    const lines = output.split('\n');
+    const metrics = {
+        lcp: null,
+        fid: null,
+        cls: null
+    };
 
+    const lines = output.split('\n');
     for (const line of lines) {
-        if (line.includes('LCP:')) {
-            metrics.lcp = parseFloat(line.split(':')[1]);
-        } else if (line.includes('FID:')) {
-            metrics.fid = parseFloat(line.split(':')[1]);
-        } else if (line.includes('CLS:')) {
-            metrics.cls = parseFloat(line.split(':')[1]);
+        if (line.includes('Current:')) {
+            const [metric, value] = line.split('Current:').map(s => s.trim());
+            const numericValue = parseFloat(value);
+            if (!isNaN(numericValue)) {
+                if (line.toLowerCase().includes('lcp:')) metrics.lcp = numericValue;
+                else if (line.toLowerCase().includes('fid:')) metrics.fid = numericValue;
+                else if (line.toLowerCase().includes('cls:')) metrics.cls = numericValue;
+            }
         }
     }
 
     return metrics;
 }
 
+async function runWebVitalsCheck(device = 'desktop', attempt = 1, maxAttempts = 2) {
+    const url = 'https://adobecom.github.io/caas/';
+    const command = `node ./web-vitals-check.js "${url}" ${device === 'mobile' ? '--mobile' : '--desktop-only'}`;
+
+    try {
+        const { stdout, stderr } = await execPromise(command);
+        if (stderr) {
+            console.error('Command stderr:', stderr);
+        }
+        return parseMetrics(stdout);
+    } catch (error) {
+        console.error(`Error in attempt ${attempt}:`, error.message);
+        if (attempt < maxAttempts) {
+            console.log(`Retrying... (Attempt ${attempt + 1}/${maxAttempts})`);
+            await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds before retry
+            return runWebVitalsCheck(device, attempt + 1, maxAttempts);
+        }
+        throw error;
+    }
+}
+
 async function collectMetrics(device = 'desktop', runs = 5) {
     console.log(`\nCollecting ${device} metrics (${runs} runs)...`);
     const results = [];
-    const maxRetries = 2; // Limit retries per rnu
+    let currentRun = 1;
 
-    for (let i = 0; i < runs; i++) {
-        console.log(`\nRun ${i + 1}/${runs}`);
-        let retryCount = 0;
+    while (currentRun <= runs) {
+        console.log(`\nRun ${currentRun}/${runs}`);
         try {
-            const command = `node ./web-vitals-check.js https://adobecom.github.io/caas/ ${device === 'mobile' ? '--mobile' : ''}`;
-            const output = execSync(command, {
-                stdio: ['pipe', 'pipe', 'pipe'],
-                timeout: 60000,
-            }).toString();
-            const metrics = parseMetrics(output);
-            results.push(metrics);
+            const metrics = await runWebVitalsCheck(device);
+            if (metrics.lcp || metrics.fid || metrics.cls) {
+                results.push(metrics);
+                currentRun++;
+            } else {
+                throw new Error('No metrics collected');
+            }
 
             // Wait between runs
-            if (i < runs - 1) {
+            if (currentRun <= runs) {
                 await new Promise(resolve => setTimeout(resolve, 5000));
             }
         } catch (error) {
-            console.error(`Error in run ${i + 1}:`, error.message);
-            retryCount++;
-            if (retryCount <= maxRetries) {
-                i--; // Retry this run
-                console.log(`Retrying... (Attempt ${retryCount}/${maxRetries})`);
-                // eslint-disable-next-line max-len,no-await-in-loop
-                await new Promise(resolve => setTimeout(resolve, 10000)); // Wait longer between retries
+            console.error(`Error in run ${currentRun}:`, error.message);
+            // Only retry failed runs up to a certain number of times
+            if (results.length === 0) {
+                console.log('Retrying failed run...');
+                await new Promise(resolve => setTimeout(resolve, 5000));
             } else {
-                console.log(`Maximum retries reached for run ${i + 1}, moving to next run`);
+                currentRun++; // Move on if we have at least some results
             }
         }
-    }
-
-    if (results.length === 0) {
-        throw new Error(`Failed to collect any successful measurements for ${device}`);
     }
 
     // Calculate statistics for each metric
@@ -79,8 +100,7 @@ async function collectMetrics(device = 'desktop', runs = 5) {
             stats[metric] = {
                 values,
                 mean: calculateMean(values),
-                stdDev: calculateStdDev(values),
-                sampleSize: values.length,
+                stdDev: calculateStdDev(values)
             };
         }
     });
@@ -88,11 +108,21 @@ async function collectMetrics(device = 'desktop', runs = 5) {
     return stats;
 }
 
+async function ensureDirectoryExists(dirPath) {
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
+    }
+}
+
 async function main() {
     try {
-        // Collect metrics for both devices
-        const desktopStats = await collectMetrics('desktop');
-        const mobileStats = await collectMetrics('mobile');
+        // Create .github directory if it doesn't exist
+        const githubDir = path.join(process.cwd(), '.github');
+        await ensureDirectoryExists(githubDir);
+
+        // Collect metrics for desktop only initially
+        console.log('Starting desktop metrics collection...');
+        const desktopStats = await collectMetrics('desktop', 5);
 
         const record = {
             timestamp: new Date().toISOString(),
@@ -101,28 +131,39 @@ async function main() {
                 title: process.env.PR_TITLE || 'unknown'
             },
             metrics: {
-                desktop: desktopStats,
-                mobile: mobileStats
+                desktop: desktopStats
             }
         };
 
         // Save to history file
-        const historyPath = path.join(process.cwd(), '.github', 'web-vitals-history.json');
+        const historyPath = path.join(githubDir, 'web-vitals-history.json');
         let history = [];
 
         if (fs.existsSync(historyPath)) {
-            history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
+            try {
+                const content = fs.readFileSync(historyPath, 'utf8');
+                history = JSON.parse(content);
+            } catch (error) {
+                console.warn('Error reading history file, starting fresh:', error.message);
+            }
+        }
+
+        // Ensure history is an array
+        if (!Array.isArray(history)) {
+            history = [];
         }
 
         history.push(record);
+
+        // Write the updated history
         fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
 
         // Output summary
-        console.log('\nMetrics collected:');
+        console.log('\nMetrics collected successfully:');
         console.log(JSON.stringify(record, null, 2));
 
     } catch (error) {
-        console.error('Error collecting metrics:', error);
+        console.error('Fatal error collecting metrics:', error);
         process.exit(1);
     }
 }
