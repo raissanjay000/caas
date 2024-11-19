@@ -35,12 +35,17 @@ function parseMetrics(output) {
 async function collectMetrics(device = 'desktop', runs = 5) {
     console.log(`\nCollecting ${device} metrics (${runs} runs)...`);
     const results = [];
+    const maxRetries = 2; // Limit retries per rnu
 
     for (let i = 0; i < runs; i++) {
         console.log(`\nRun ${i + 1}/${runs}`);
+        let retryCount = 0;
         try {
             const command = `node ./web-vitals-check.js https://adobecom.github.io/caas/ ${device === 'mobile' ? '--mobile' : ''}`;
-            const output = execSync(command, { stdio: ['pipe', 'pipe', 'pipe'] }).toString();
+            const output = execSync(command, {
+                stdio: ['pipe', 'pipe', 'pipe'],
+                timeout: 60000,
+            }).toString();
             const metrics = parseMetrics(output);
             results.push(metrics);
 
@@ -50,8 +55,20 @@ async function collectMetrics(device = 'desktop', runs = 5) {
             }
         } catch (error) {
             console.error(`Error in run ${i + 1}:`, error.message);
-            i--; // Retry this run
+            retryCount++;
+            if (retryCount <= maxRetries) {
+                i--; // Retry this run
+                console.log(`Retrying... (Attempt ${retryCount}/${maxRetries})`);
+                // eslint-disable-next-line max-len,no-await-in-loop
+                await new Promise(resolve => setTimeout(resolve, 10000)); // Wait longer between retries
+            } else {
+                console.log(`Maximum retries reached for run ${i + 1}, moving to next run`);
+            }
         }
+    }
+
+    if (results.length === 0) {
+        throw new Error(`Failed to collect any successful measurements for ${device}`);
     }
 
     // Calculate statistics for each metric
@@ -62,7 +79,8 @@ async function collectMetrics(device = 'desktop', runs = 5) {
             stats[metric] = {
                 values,
                 mean: calculateMean(values),
-                stdDev: calculateStdDev(values)
+                stdDev: calculateStdDev(values),
+                sampleSize: values.length,
             };
         }
     });
