@@ -39,7 +39,7 @@ async function collectMetrics(device = 'desktop', runs = 5) {
     for (let i = 0; i < runs; i++) {
         console.log(`\nRun ${i + 1}/${runs}`);
         try {
-            const command = `node ./web-vitals-check.js http://your-url.com ${device === 'mobile' ? '--mobile' : ''}`;
+            const command = `node ./web-vitals-check.js https://adobecom.github.io/caas/ ${device === 'mobile' ? '--mobile' : ''}`;
             const output = execSync(command, { stdio: ['pipe', 'pipe', 'pipe'] }).toString();
             const metrics = parseMetrics(output);
             results.push(metrics);
