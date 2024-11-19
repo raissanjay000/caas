@@ -15,10 +15,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           validateSingleCommit: false
-          scopes: |
-            MWPW-*
-          requireScope: true
           scopeRegex: '^MWPW-[0-9]+$'
+          requireScope: true
   check-linting:
     runs-on: ubuntu-latest
     steps:
