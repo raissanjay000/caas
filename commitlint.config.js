@@ -1,8 +1,21 @@
 module.exports = {
     extends: ['@commitlint/config-conventional'],
+    plugins: [
+        {
+            rules: {
+                'jira-ticket-in-scope': ({scope}) => {
+                    const pattern = /^MWPW-\d+$/;
+                    const hasValidTicket = pattern.test(scope || '');
+                    return [
+                        hasValidTicket,
+                        'Scope must contain JIRA ticket (e.g., feat(MWPW-123): message)',
+                    ];
+                },
+            },
+        },
+    ],
     rules: {
-        'scope-empty': [2, 'never'], // require scope
-        'scope-pattern': [2, 'always', /^MWPW-\d+$/], // enforce MWPW-numbers ONLY in scope
-        'header-pattern': [2, 'always', /^(?:feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)\(MWPW-\d+\):/], // stricter header pattern
+        'scope-empty': [2, 'never'], // scope is required
+        'jira-ticket-in-scope': [2, 'always'], // enforce our custom rule
     },
 };
