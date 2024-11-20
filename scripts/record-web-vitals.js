@@ -7,12 +7,24 @@ const execPromise = util.promisify(exec);
 async function collectMetrics() {
     // Check for both PR merge and direct push to main
     const isMergeContext = (
+        // If we have PR_NUMBER, treat it as a PR merge
+        process.env.PR_NUMBER ||
+        // Otherwise use the original conditions
         (process.env.GITHUB_EVENT_NAME === 'pull_request' &&
             process.env.GITHUB_EVENT_ACTION === 'closed' &&
             process.env.GITHUB_PULL_REQUEST_MERGED === 'true') ||
         (process.env.GITHUB_EVENT_NAME === 'push' &&
             process.env.GITHUB_REF === 'refs/heads/main')
     );
+
+    // Always use PR information if available
+    const prInfo = process.env.PR_NUMBER ? {
+        number: process.env.PR_NUMBER,
+        title: process.env.PR_TITLE
+    } : {
+        number: process.env.GITHUB_SHA?.substring(0, 7) || 'unknown',
+        title: 'Direct push to main'
+    };
 
     console.log('Environment variables:', {
         GITHUB_EVENT_NAME: process.env.GITHUB_EVENT_NAME,
@@ -61,13 +73,7 @@ async function collectMetrics() {
 
                 const record = {
                     date: new Date().toISOString(),
-                    pr: process.env.GITHUB_EVENT_NAME === 'pull_request' ? {
-                        number: process.env.PR_NUMBER || 'unknown',
-                        title: process.env.PR_TITLE || 'unknown'
-                    } : {
-                        number: process.env.GITHUB_SHA?.substring(0, 7) || 'unknown',
-                        title: 'Direct push to main'
-                    },
+                    pr: prInfo,
                     metrics: currentMetrics.metrics
                 };
 
