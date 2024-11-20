@@ -22,5 +22,17 @@
       "fid": 1,
       "cls": null
     }
+  },
+  {
+    "date": "2024-11-20T11:27:05.815Z",
+    "pr": {
+      "number": "5f07e75",
+      "title": "Direct push to main"
+    },
+    "metrics": {
+      "lcp": 10329.099999999977,
+      "fid": 0.5999999999767169,
+      "cls": null
+    }
   }
 ]
