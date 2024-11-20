@@ -110,8 +110,21 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const fs = require('fs');
-            const metrics = JSON.parse(fs.readFileSync('.github/current-metrics.json', 'utf8'));
+            let metrics;
+            try {
+              const fs = require('fs');
+              metrics = JSON.parse(fs.readFileSync('.github/current-metrics.json', 'utf8'));
+            } catch (error) {
+              console.log('Error reading metrics file:', error);
+              metrics = {
+                date: new Date().toISOString(),
+                metrics: {
+                  lcp: null,
+                  fid: null,
+                  cls: null
+                }
+              };
+            }
             
             const formatMetric = (value) => {
               if (value === null) return 'N/A';
@@ -122,12 +135,12 @@ jobs:
 
             | Metric | Value |
             |--------|-------|
-            | LCP | ${formatMetric(metrics.metrics.lcp)} s |
-            | FID | ${formatMetric(metrics.metrics.fid)} ms |
-            | CLS | ${formatMetric(metrics.metrics.cls)} |
-            
+            | LCP | ${formatMetric(metrics.metrics?.lcp)} s |
+            | FID | ${formatMetric(metrics.metrics?.fid)} ms |
+            | CLS | ${formatMetric(metrics.metrics?.cls)} |
+
             Recorded at: ${metrics.date}
-            PR: #${metrics.pr.number}`;
+            PR: #${context.issue.number}`;
             
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
