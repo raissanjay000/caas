@@ -33,6 +33,37 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get PR Information
+        id: pr-info
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const commit = context.sha;
+            const { owner, repo } = context.repo;
+            
+            // Find the PR that was merged
+            const { data: prs } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'closed',
+              sort: 'updated',
+              direction: 'desc',
+              per_page: 100
+            });
+            
+            const mergedPR = prs.find(pr => pr.merge_commit_sha === commit);
+            
+            if (mergedPR) {
+              core.exportVariable('PR_NUMBER', mergedPR.number);
+              core.exportVariable('PR_TITLE', mergedPR.title);
+              core.exportVariable('GITHUB_EVENT_NAME', 'pull_request');
+              core.exportVariable('GITHUB_EVENT_ACTION', 'closed');
+              core.exportVariable('GITHUB_PULL_REQUEST_MERGED', 'true');
+            
+              console.log(`Found PR #${mergedPR.number}: ${mergedPR.title}`);
+            } else {
+              console.log('No matching PR found for this commit');
+            }
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
