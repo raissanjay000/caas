@@ -73,12 +73,13 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
-  run-web-vitals-checks:
+  record-web-vitals:
     runs-on: ubuntu-latest
     needs: deployment
     steps:
       - uses: actions/checkout@v3
-
+        with:
+          fetch-depth: 0  # Required for git history
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -107,27 +108,23 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const metrics = JSON.parse(fs.readFileSync('.github/web-vitals-history.json', 'utf8'));
-            const latest = metrics[metrics.length - 1];
+            const metrics = JSON.parse(fs.readFileSync('.github/current-metrics.json', 'utf8'));
             
-            const formatMetric = (metric) => {
-              if (!metric) return 'Not available';
-              return `${metric.mean.toFixed(2)} ±${metric.stdDev.toFixed(2)}`;
+            const formatMetric = (value) => {
+              if (value === null) return 'N/A';
+              return value.toFixed(2);
             };
             
-            const comment = `## Core Web Vitals Results
+            const comment = `## Web Vitals Metrics
 
-            ### Desktop
-            - LCP: ${formatMetric(latest.metrics.desktop.lcp)}
-            - FID: ${formatMetric(latest.metrics.desktop.fid)}
-            - CLS: ${formatMetric(latest.metrics.desktop.cls)}
+            | Metric | Value |
+            |--------|-------|
+            | LCP | ${formatMetric(metrics.metrics.lcp)} s |
+            | FID | ${formatMetric(metrics.metrics.fid)} ms |
+            | CLS | ${formatMetric(metrics.metrics.cls)} |
             
-            ### Mobile
-            - LCP: ${formatMetric(latest.metrics.mobile.lcp)}
-            - FID: ${formatMetric(latest.metrics.mobile.fid)}
-            - CLS: ${formatMetric(latest.metrics.mobile.cls)}
-            
-            Recorded at: ${latest.timestamp}
+            Recorded at: ${metrics.date}
+            PR: #${metrics.pr.number}
             `;
             
             await github.rest.issues.createComment({
@@ -138,7 +135,7 @@ jobs:
             });
 
       - name: Commit updated history
-        if: github.event.pull_request.merged == true
+        if: github.event.action == 'closed' && github.event.pull_request.merged == true
         run: |
             git config --global user.name 'GitHub Action'
             git config --global user.email 'action@github.com'

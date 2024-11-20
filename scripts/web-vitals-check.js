@@ -1,9 +1,6 @@
-// web-vitals-check.js
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
-
-const SAMPLE_COUNT = 5;
 
 // Device settings matching Google's testing parameters
 const DEVICES = {
@@ -46,148 +43,19 @@ const NETWORK_PRESETS = {
     },
 };
 
-// Statistics helper functions
-function calculateMean(values) {
-    if (!values.length) return null;
-    return values.reduce((sum, val) => sum + val, 0) / values.length;
-}
-
-function calculateStdDev(values) {
-    if (values.length < 2) return null;
-    const mean = calculateMean(values);
-    const squareDiffs = values.map(value => Math.pow(value - mean, 2));
-    const variance = calculateMean(squareDiffs);
-    return Math.sqrt(variance);
-}
-
-function calculateTScore(value, mean, stdDev, n) {
-    if (!mean || !stdDev) return null;
-    return (value - mean) / (stdDev / Math.sqrt(n));
-}
-
-function checkBaselineExists(device) {
-    const historyPath = path.join(process.cwd(), '.github', 'web-vitals-history.json');
-    console.log('Looking for baseline at:', historyPath);
-    try {
-        if (!fs.existsSync(historyPath)) {
-            console.log('File does not exist');
-            return false;
-        }
-        const history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
-        console.log('Found history file, checking device:', device);
-        console.log('Current history:', JSON.stringify(history, null, 2));
-
-        // Check if we have at least one metric with enough samples
-        return history[device] && (
-            history[device].lcp.points.length === SAMPLE_COUNT ||
-            history[device].fid.points.length === SAMPLE_COUNT ||
-            history[device].cls.points.length === SAMPLE_COUNT
-        );
-    } catch (error) {
-        console.log('Error reading baseline:', error);
-        return false;
-    }
-}
-
-async function handleMetricsHistory(metrics, device) {
-    const historyPath = path.join(process.cwd(), '.github', 'web-vitals-history.json');
-    let history = {};
-
-    try {
-        if (fs.existsSync(historyPath)) {
-            history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
-        }
-    } catch (error) {
-        console.log('No existing history found, creating new history file');
-    }
-
-    if (!history[device]) {
-        history[device] = {
-            lcp: { points: [], currentStats: { mean: null, stdDev: null, sampleSize: 0 } },
-            fid: { points: [], currentStats: { mean: null, stdDev: null, sampleSize: 0 } },
-            cls: { points: [], currentStats: { mean: null, stdDev: null, sampleSize: 0 } },
-        };
-    }
-
-    const results = {
-        metrics: {},
-        changes: {},
-    };
-
-    for (const [metric, value] of Object.entries(metrics)) {
-        if (value === null) continue;
-
-        const metricHistory = history[device][metric];
-        const currentStats = metricHistory.currentStats;
-
-        let tScore = null;
-        if (currentStats.mean !== null && currentStats.stdDev !== null) {
-            tScore = calculateTScore(
-                value,
-                currentStats.mean,
-                currentStats.stdDev,
-                metricHistory.points.length,
-            );
-        }
-
-        let changeType = 'NO_CHANGE';
-        if (tScore !== null) {
-            if (value < currentStats.mean) { // Better performance is lower value
-                if (Math.abs(tScore) > 2.132) { // 95% confidence for improvements (df=4)
-                    changeType = 'IMPROVEMENT';
-                }
-            } else if (value > currentStats.mean) {
-                if (Math.abs(tScore) > 1.533) { // 90% confidence for regressions (df=4)
-                    changeType = 'REGRESSION';
-                }
-            }
-        }
-
-        if (changeType === 'IMPROVEMENT' || metricHistory.points.length < SAMPLE_COUNT) {
-            metricHistory.points.push({
-                value,
-                date: new Date().toISOString(),
-                branch: process.env.GITHUB_HEAD_REF || 'main',
-            });
-
-            if (metricHistory.points.length > SAMPLE_COUNT) {
-                metricHistory.points.shift();
-            }
-
-            const values = metricHistory.points.map(p => p.value);
-            metricHistory.currentStats = {
-                mean: calculateMean(values),
-                stdDev: calculateStdDev(values),
-                sampleSize: values.length,
-                lastUpdated: new Date().toISOString(),
-            };
-        }
-
-        results.metrics[metric] = {
-            value,
-            mean: currentStats.mean,
-            stdDev: currentStats.stdDev,
-            tScore,
-            changeType,
-        };
-
-        results.changes[metric] = changeType;
-    }
-
-    const dir = path.dirname(historyPath);
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
-
-    return results;
-}
+// Thresholds for metrics (based on Google's standards)
+const THRESHOLDS = {
+    lcp: { good: 2500, poor: 4000 },
+    fid: { good: 100, poor: 300 },
+    cls: { good: 0.1, poor: 0.25 },
+};
 
 async function simulateUserInteractions(page) {
     console.log('Simulating user interactions...');
     const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
     try {
+        // Simulate scrolling behavior
         await page.evaluate(async () => {
             const scroll = async () => {
                 const totalHeight = document.body.scrollHeight;
@@ -203,6 +71,7 @@ async function simulateUserInteractions(page) {
 
         await wait(1000);
 
+        // Find and click interactive elements
         const clickableElements = await page.evaluate(() => {
             const elements = document.querySelectorAll('button, a, input[type="button"], [role="button"], [role="link"]');
             return Array.from(elements, el => ({
@@ -213,6 +82,7 @@ async function simulateUserInteractions(page) {
             })).filter(el => el.visible);
         });
 
+        // Click first 3 visible interactive elements
         for (const element of clickableElements.slice(0, 3)) {
             try {
                 await page.mouse.click(element.x + 5, element.y + 5);
@@ -225,7 +95,6 @@ async function simulateUserInteractions(page) {
         console.log('Error during interactions:', error.message);
     }
 }
-
 async function measureWebVitals(url, options = {}) {
     const {
         device = 'desktop',
@@ -265,6 +134,7 @@ async function measureWebVitals(url, options = {}) {
         page.setDefaultNavigationTimeout(120000);
         page.setDefaultTimeout(120000);
 
+        // Setup network conditions
         const client = await page.target().createCDPSession();
         await client.send('Network.enable');
         await client.send('Network.emulateNetworkConditions', {
@@ -273,12 +143,14 @@ async function measureWebVitals(url, options = {}) {
             connectionType: 'cellular4g',
         });
 
+        // Setup device emulation
         const deviceSettings = DEVICES[device];
         await page.setUserAgent(deviceSettings.userAgent || '');
         await page.setViewport(deviceSettings.viewport);
 
         await page.setCacheEnabled(false);
 
+        // Initialize web vitals data collection
         await page.evaluateOnNewDocument(() => {
             window.webVitalsData = {
                 lcp: null,
@@ -297,6 +169,7 @@ async function measureWebVitals(url, options = {}) {
             timeout: 120000,
         });
 
+        // Load web-vitals library with retries
         let retries = 3;
         while (retries > 0) {
             try {
@@ -313,6 +186,7 @@ async function measureWebVitals(url, options = {}) {
             }
         }
 
+        // Setup metrics collection
         await page.evaluate(() => {
             webVitals.onLCP((lcp) => { window.logMetric('lcp', lcp.value); });
             webVitals.onFID((fid) => { window.logMetric('fid', fid.value); });
@@ -321,12 +195,14 @@ async function measureWebVitals(url, options = {}) {
 
         await simulateUserInteractions(page);
 
+        // Wait for metrics to stabilize
         const waitTime = isCI ? 15000 : 10000;
         console.log(`Waiting ${waitTime}ms for metrics to stabilize...`);
         await new Promise(resolve => setTimeout(resolve, waitTime));
 
         const metrics = await page.evaluate(() => window.webVitalsData);
         return metrics;
+
     } catch (error) {
         if (error.name === 'TimeoutError') {
             console.error('Page load timed out. Consider adjusting network conditions or timeout values.');
@@ -352,150 +228,73 @@ async function measureWithFallback(url, options) {
         throw error;
     }
 }
-
-const THRESHOLDS = {
-    lcp: { good: 2500, poor: 4000 },
-    fid: { good: 100, poor: 300 },
-    cls: { good: 0.1, poor: 0.25 },
-};
 async function main() {
     const args = process.argv.slice(2);
     const url = args[0];
 
-    const options = {
-        initializeBaseline: args.includes('--init-baseline'),
-        device: args.includes('--mobile-only') ? 'mobile' :
-            args.includes('--desktop-only') ? 'desktop' : 'both',
-    };
-
     if (!url) {
         console.error('Please provide a URL to test');
-        console.error('Usage: node web-vitals-check.js <url> [--init-baseline] [--mobile-only|--desktop-only]');
+        console.error('Usage: node web-vitals-check.js <url> [--desktop-only]');
         process.exit(1);
     }
 
     try {
-        if (options.initializeBaseline) {
-            const devicesToTest = options.device === 'both'
-                ? ['desktop', 'mobile']
-                : [options.device];
-
-            for (const device of devicesToTest) {
-                console.log(`\n${'-'.repeat(50)}`);
-                console.log(`Initializing ${device} baseline with ${SAMPLE_COUNT} samples...`);
-                console.log(`${'-'.repeat(50)}\n`);
-
-                const samples = [];
-                let sampleCount = 0;
-
-                while (sampleCount < SAMPLE_COUNT) {
-                    const currentSample = sampleCount + 1;
-                    console.log(`\nCollecting ${device} sample ${currentSample} of ${SAMPLE_COUNT}...`);
-                    try {
-                        const metrics = await measureWithFallback(url, { device });
-                        samples.push(metrics);
-                        sampleCount++;
-                        if (sampleCount < SAMPLE_COUNT) {
-                            console.log('Waiting 5 seconds before next sample...');
-                            await new Promise(resolve => setTimeout(resolve, 5000));
-                        }
-                    } catch (error) {
-                        console.error(`Error collecting ${device} sample ${currentSample}:`, error);
-                        continue;
-                    }
-                }
-
-                console.log('\nProcessing samples...');
-                for (const metrics of samples) {
-                    await handleMetricsHistory(metrics, device);
-                }
-
-                console.log(`\n✅ ${device} baseline initialization complete!`);
-
-                if (device === 'desktop' && devicesToTest.includes('mobile')) {
-                    console.log('\nWaiting 10 seconds before starting mobile tests...');
-                    await new Promise(resolve => setTimeout(resolve, 10000));
-                }
-            }
-
-            console.log('\n🎉 All baseline initialization complete!');
-            process.exit(0);
-        }
-
-        // Regular check mode
-        const deviceToTest = args.includes('--mobile') ? 'mobile' : 'desktop';
-
-        // Check if baseline exists
-        if (!checkBaselineExists(deviceToTest)) {
-            console.error('\n⚠️  No baseline found for', deviceToTest);
-            console.error(`Please run: node web-vitals-check.js ${url} --init-baseline`);
-            process.exit(1);
-        }
-
         console.log(`Starting Web Vitals check for ${url}`);
-        console.log('Test configuration:', { device: deviceToTest });
 
-        const metrics = await measureWithFallback(url, { device: deviceToTest });
-        const results = await handleMetricsHistory(metrics, deviceToTest);
+        // Run measurements
+        const metrics = await measureWithFallback(url, {
+            device: args.includes('--mobile') ? 'mobile' : 'desktop'
+        });
 
-        // Write current run metrics to file for GitHub Actions
-        if (process.env.CI) {
-            const currentMetrics = {
-                timestamp: new Date().toISOString(),
-                metrics: {
-                    [options.device]: {
-                        lcp: results.metrics.lcp,
-                        fid: results.metrics.fid,
-                        cls: results.metrics.cls,
-                    },
-                },
-            };
-            fs.writeFileSync('current-metrics.json', JSON.stringify(currentMetrics, null, 2));
+        // Create .github directory if it doesn't exist
+        const githubDir = path.join(process.cwd(), '.github');
+        if (!fs.existsSync(githubDir)) {
+            fs.mkdirSync(githubDir, { recursive: true });
         }
 
+        // Save metrics
+        const record = {
+            date: new Date().toISOString(),
+            metrics,
+        };
+
+        fs.writeFileSync(
+            path.join(githubDir, 'current-metrics.json'),
+            JSON.stringify(record, null, 2)
+        );
+
+        // Output results
         console.log('\nResults:');
         console.log('-'.repeat(50));
-
-        let hasFailures = false;
         Object.entries(metrics).forEach(([metric, value]) => {
             if (value !== null) {
                 const threshold = THRESHOLDS[metric];
-                const stats = results.metrics[metric];
-                const changeType = results.changes[metric];
-
-                if (!threshold) return;
-
-                console.log(`\n${metric.toUpperCase()}:`);
-                console.log(`Current: ${value.toFixed(2)}`);
-                console.log(`Baseline: μ=${stats.mean.toFixed(2)}, σ=${stats.stdDev.toFixed(2)}`);
-
-                const icon = changeType === 'IMPROVEMENT' ? '✅' :
-                    changeType === 'REGRESSION' ? '❌' : '➖';
-
-                console.log(`T-Score: ${stats.tScore.toFixed(2)} ${icon}`);
-                console.log(`Status: ${changeType}`);
-
-                if (changeType === 'REGRESSION') {
-                    hasFailures = true;
-                    console.log('❌ Shows significant regression from baseline');
+                let status = '➖';
+                if (threshold) {
+                    if (value <= threshold.good) status = '✅';
+                    else if (value >= threshold.poor) status = '❌';
                 }
+                console.log(`${metric.toUpperCase()}: ${value.toFixed(2)} ${status}`);
             } else {
                 console.log(`${metric.toUpperCase()}: Not available ⚠️`);
             }
         });
 
-        console.log(`\n${'-'.repeat(50)}`);
+        // Exit based on success
+        const hasFailures = Object.entries(metrics).some(([metric, value]) => {
+            if (value === null) return false;
+            const threshold = THRESHOLDS[metric];
+            return threshold && value >= threshold.poor;
+        });
 
-        if (hasFailures && process.env.CI === 'true') {
-            console.error('\n❌ Core Web Vitals check failed due to significant regression');
+        if (hasFailures) {
+            console.error('\n❌ Some Core Web Vitals metrics are poor');
             process.exit(1);
         } else {
             console.log('\n✅ Core Web Vitals check completed');
-            if (Object.values(results.changes).includes('IMPROVEMENT')) {
-                console.log('🎉 Improvements detected! Baseline updated.');
-            }
             process.exit(0);
         }
+
     } catch (error) {
         console.error('Error running Web Vitals check:', error);
         if (error.message.includes('Timeout')) {
