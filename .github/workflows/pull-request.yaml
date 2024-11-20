@@ -131,7 +131,7 @@ jobs:
               return value.toFixed(2);
             };
             
-            const comment = `## Web Vitals Metrics
+            const comment = `## Core Web Vitals Metrics
 
             | Metric | Value |
             |--------|-------|
