@@ -28,7 +28,7 @@ async function collectMetrics() {
     try {
         // Run web-vitals-check.js
         const url = 'https://adobecom.github.io/caas/';
-        const command = `node ${path.join(process.cwd(), 'scripts', 'web-vitals-check.js')} "${url}"`;
+        const command = `node ${path.join(process.cwd(), 'scripts', 'web-vitals-check.js')} "${url}" --mobile`;
 
         try {
             console.log('Running web-vitals-check.js...');
