@@ -1,0 +1,14 @@
+[
+  {
+    "date": "2024-11-20T10:38:03.456Z",
+    "pr": {
+      "number": "2af1d06",
+      "title": "Direct push to main"
+    },
+    "metrics": {
+      "lcp": 12806.599999999977,
+      "fid": 0.6000000000349246,
+      "cls": null
+    }
+  }
+]
