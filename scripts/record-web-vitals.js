@@ -72,7 +72,7 @@ async function collectMetrics() {
                 }
 
                 // Update history file
-                const historyPath = path.join(githubDir, 'web-vitals-history.json');
+                const historyPath = path.join(process.cwd(), 'web-vitals-history.json');
                 console.log('Updating history at:', historyPath);
                 let history = [];
 
