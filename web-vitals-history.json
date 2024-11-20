@@ -10,5 +10,17 @@
       "fid": 0.6000000000349246,
       "cls": null
     }
+  },
+  {
+    "date": "2024-11-20T11:10:18.967Z",
+    "pr": {
+      "number": "16d2dc4",
+      "title": "Direct push to main"
+    },
+    "metrics": {
+      "lcp": 13191.400000000023,
+      "fid": 1,
+      "cls": null
+    }
   }
 ]
