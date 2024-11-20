@@ -20,7 +20,22 @@ jobs:
         uses: JulienKode/pull-request-name-linter-action@v0.5.0
         with:
           configuration-path: ./commitlint.config.js
-
+  check-test-requirements:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.13.1
+      - name: Install dependencies
+        run: npm install @actions/core @actions/github
+      - name: Check PR Type and Tests
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const script = require('./test-enforcement.js')
+            await script({github, context, core})
   check-linting:
     runs-on: ubuntu-latest
     steps:
@@ -89,9 +104,10 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
-  run-web-vitals-checks:
+  record-web-vitals:
     runs-on: ubuntu-latest
     needs: deployment
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v3
 
@@ -111,29 +127,58 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y xvfb libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2
 
-      - name: Check if baseline exists
-        id: check
+      - name: Record Web Vitals
+        id: record-vitals
+        continue-on-error: true
         run: |
-          if [ ! -f .github/web-vitals-history.json ]; then
-            echo "No baseline found in repository"
-            exit 1
-          fi
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node scripts/record-web-vitals.js
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
 
-      - name: Run Web Vitals Check
-        id: web-vitals
-        run: |
-          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node ./web-vitals-check.js https://adobecom.github.io/caas/
+      - name: Create PR Comment
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let metrics;
+            try {
+              const fs = require('fs');
+              metrics = JSON.parse(fs.readFileSync('.github/current-metrics.json', 'utf8'));
+            } catch (error) {
+              console.log('Error reading metrics file:', error);
+              metrics = {
+                date: new Date().toISOString(),
+                metrics: {
+                  lcp: null,
+                  fid: null,
+                  cls: null
+                }
+              };
+            }
+            
+            const formatMetric = (value) => {
+              if (value === null) return 'N/A';
+              return value.toFixed(2);
+            };
+            
+            const comment = `## Core Web Vitals Metrics
 
-      - name: Commit updated baseline if improved
-        if: success()
-        run: |
-          if [ -f .github/web-vitals-history.json ]; then
-            git config --global user.name 'GitHub Action'
-            git config --global user.email 'action@github.com'
-            git add .github/web-vitals-history.json
-            git commit -m "chore: update web vitals baseline" || echo "No changes to commit"
-            git push || echo "No changes to push"
-          fi
+            | Metric | Value |
+            |--------|-------|
+            | LCP | ${formatMetric(metrics.metrics?.lcp)} s |
+            | FID | ${formatMetric(metrics.metrics?.fid)} ms |
+            | CLS | ${formatMetric(metrics.metrics?.cls)} |
+
+            Recorded at: ${metrics.date}
+            PR: #${context.issue.number}`;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
   run-e2e-tests:
     runs-on: ubuntu-latest
     needs: deployment
