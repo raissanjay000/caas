@@ -1,5 +1,5 @@
 /*!
- * Chimera UI Libraries - Build 0.23.24 (12/11/2024, 13:09:05)
+ * Chimera UI Libraries - Build 0.23.24 (12/11/2024, 13:58:09)
  *         
  */
 /******/ (function(modules) { // webpackBootstrap
@@ -7173,6 +7173,7 @@ var Container = function Container(props) {
                     return;
                 }
                 if (payload.isHashed && !hashedRef.current) {
+                    hashedRef.current = true;
                     var TAG_HASH_LENGTH = 6;
                     var _iteratorNormalCompletion = true;
                     var _didIteratorError = false;

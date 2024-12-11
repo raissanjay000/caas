@@ -837,6 +837,7 @@ const Container = (props) => {
                         return;
                     }
                     if (payload.isHashed && !hashedRef.current) {
+                        hashedRef.current = true;
                         const TAG_HASH_LENGTH = 6;
                         for (const group of authoredFilters) {
                             group.id = rollingHash(group.id, TAG_HASH_LENGTH);
