@@ -1,5 +1,5 @@
 /*!
- * Chimera UI Libraries - Build 0.23.24 (12/11/2024, 13:58:09)
+ * Chimera UI Libraries - Build 0.23.25 (12/12/2024, 14:19:59)
  *         
  */
 /******/ (function(modules) { // webpackBootstrap
@@ -2389,7 +2389,10 @@ var getDateAscSort = exports.getDateAscSort = function getDateAscSort(cards) {
         var cardOneDate = (0, _general.getByPath)(cardOne, 'cardDate');
         var cardTwoDate = (0, _general.getByPath)(cardTwo, 'cardDate');
         if (cardOneDate && cardTwoDate) {
-            return cardOneDate !== cardTwoDate ? cardOneDate.localeCompare(cardTwoDate) : -1;
+            if (cardOneDate !== cardTwoDate) {
+                return cardOneDate.localeCompare(cardTwoDate);
+            }
+            return (cardOne.id || '').localeCompare(cardTwo.id || '');
         }
         return 0;
     });
