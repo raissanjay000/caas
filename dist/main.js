@@ -1,5 +1,5 @@
 /*!
- * Chimera UI Libraries - Build 0.23.24 (12/3/2024, 18:51:13)
+ * Chimera UI Libraries - Build 0.23.25 (12/12/2024, 14:19:59)
  *         
  */
 /******/ (function(modules) { // webpackBootstrap
@@ -6382,6 +6382,8 @@ var Container = function Container(props) {
         isPartialLoad = _useState8[0],
         setIsPartialLoad = _useState8[1];
 
+    var hashedRef = (0, _react.useRef)(false);
+
     var _React$useState = _react2.default.useState(),
         _React$useState2 = _slicedToArray(_React$useState, 2),
         updateState = _React$useState2[1];
@@ -7173,7 +7175,8 @@ var Container = function Container(props) {
                     (0, _lana.logLana)({ message: 'no cards return by query to this endpoint: ' + endPoint, tags: 'collection' });
                     return;
                 }
-                if (payload.isHashed) {
+                if (payload.isHashed && !hashedRef.current) {
+                    hashedRef.current = true;
                     var TAG_HASH_LENGTH = 6;
                     var _iteratorNormalCompletion = true;
                     var _didIteratorError = false;
