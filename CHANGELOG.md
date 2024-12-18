@@ -1,5 +1,12 @@
 
 
+## [0.23.27](https://github.com/adobecom/caas/compare/0.23.26...0.23.27) (2024-12-18)
+
+
+### Bug Fixes
+
+* **MWPW-164129:** Adds fallback to Logo image ALT attribute ([#213](https://github.com/adobecom/caas/issues/213)) ([c4388a6](https://github.com/adobecom/caas/commit/c4388a68f23ee18dae708c4228450c068445304d))
+
 ## [0.23.26](https://github.com/adobecom/caas/compare/0.23.25...0.23.26) (2024-12-12)
 
 ## [0.23.25](https://github.com/adobecom/caas/compare/0.23.24...0.23.25) (2024-12-12)
