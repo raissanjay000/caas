@@ -1,5 +1,12 @@
 
 
+## [0.23.28](https://github.com/adobecom/caas/compare/0.23.27...0.23.28) (2024-12-19)
+
+
+### Bug Fixes
+
+* **MWPW-158561:** adds aria-label to search icon ([#211](https://github.com/adobecom/caas/issues/211)) ([e2a6c56](https://github.com/adobecom/caas/commit/e2a6c5652286e8d7ef46bbe906434b85aedf0cf9))
+
 ## [0.23.27](https://github.com/adobecom/caas/compare/0.23.26...0.23.27) (2024-12-18)
 
 
