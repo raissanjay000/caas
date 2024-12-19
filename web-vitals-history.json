@@ -82,5 +82,17 @@
       "fid": 0.7999999999883585,
       "cls": null
     }
+  },
+  {
+    "date": "2024-12-19T18:12:24.098Z",
+    "pr": {
+      "number": "211",
+      "title": "fix(MWPW-158561): adds aria-label to search icon"
+    },
+    "metrics": {
+      "lcp": 13126.5,
+      "fid": 0.7999999999883585,
+      "cls": null
+    }
   }
 ]
